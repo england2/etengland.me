@@ -1,5 +1,6 @@
 html {
-  background: #334455;
+  /*background: #26282f;*/
+  background: #25323e;
 }
 
 body {
@@ -109,7 +110,7 @@ pre code { background: none; }
 
 /* Mermaid diagrams */
 .mermaid {
-  background: #27282250;
+  background: #27282220;
   border: 1px solid #272822;
 
   box-shadow: 2px 2px 5px #1f2a3555;
