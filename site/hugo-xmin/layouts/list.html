@@ -6,15 +6,15 @@
 
 {{ .Content }}
 
-<ul>
+<div class="post-list">
   {{ $pages := .Pages }}
   {{ if .IsHome }}{{ $pages = .Site.RegularPages }}{{ end }}
   {{ range (where $pages "Section" "!=" "") }}
-  <li>
-    <span class="date">{{ .Date.Format "2006/01/02" }}</span>
-    <a href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a>
-  </li>
+  <article class="post-list-item">
+    <h2 class="index-title"><a href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a></h2>
+    <h3 class="index-date">{{ .Date.Format "2006/01/02" }}</h3>
+  </article>
   {{ end }}
-</ul>
+</div>
 
 {{ partial "footer.html" . }}

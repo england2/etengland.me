@@ -4,35 +4,36 @@ title: Home
 
 [<img src="https://simpleicons.org/icons/github.svg" style="max-width:15%;min-width:40px;float:right;" alt="Github repo" />](https://github.com/yihui/hugo-xmin)
 
-# HUGO XMIN
+# Elan England
 
-## _Keep it simple, but not simpler_
+This website has two things:
+1. Write-ups for larger scale projects I've made
+2. Short tutorials / articles about various software things I find interesting
 
-**XMin** is a Hugo theme written by [Yihui Xie](https://yihui.org) in about four hours: half an hour was spent on the Hugo templates, and 3.5 hours were spent on styling. The main motivation for writing this theme was to provide a really minimal example to beginners of Hugo templates. This XMin theme contains about 140 lines of code in total, including the code in HTML templates and CSS (also counting empty lines).
 
+To see all posts, 
 
-``` bash
-find . -not -path '*/exampleSite/*' \( -name '*.html' -o -name '*.css' \) | xargs wc -l
+Project writeups:
+
+## [_Shellbin_](/shellbin/)
+---
+
+This is a microservice oriented project that I built to learn about CI/CD for cloud-native applications.
+
+It's named shellbin because you can access it using nothing but some coreutils from a shell!
+```sh
+cat $FILE | nc sb. <site.url>
 ```
 
-```
-      12 ./layouts/single.html
-      20 ./layouts/list.html
-      13 ./layouts/terms.html
-       5 ./layouts/404.html
-       0 ./layouts/_partials/foot_custom.html
-       0 ./layouts/_partials/head_custom.html
-       9 ./layouts/_partials/footer.html
-      20 ./layouts/_partials/header.html
-      51 ./static/css/style.css
-       7 ./static/css/fonts.css
-     137 total
-```
+<br>
 
-I can certainly further reduce the code, for example, by eliminating the CSS, but I believe a tiny bit of CSS can greatly improve readability. You cannot really find many CSS frameworks that only contain 50 lines of code.
+## [_Web Terminal_](/webterminal/)
+---
 
-Although it is a minimal theme, it is actually fully functional. It supports pages (including the home page), blog posts, a navigation menu, categories, tags, and RSS. With [a little bit customization](https://github.com/yihui/hugo-xmin/blob/master/exampleSite/layouts/_partials/foot_custom.html), it can easily support LaTeX math expressions, e.g.,
+This is a larger, abandoned project that I took up because I wanted to do something big and scary sounding (at the time) in Kubernettes. Basically, I wanted to write some custom golang code to interact with the Kubernetes API and create/destroy pods depending on user load.
 
-`$${\sqrt {n}}\left(\left({\frac {1}{n}}\sum _{i=1}^{n}X_{i}\right)-\mu \right)\ {\xrightarrow {d}}\ N\left(0,\sigma ^{2}\right)$$`
+Additionally, I wanted to create an end-
 
-All pages not under the root directory of the website are listed below. You can also visit the list page of a single section, e.g., [posts](/post/), or [notes](/note/). See the [About](/about/) page for the usage of this theme.
+
+
+Kube builder
