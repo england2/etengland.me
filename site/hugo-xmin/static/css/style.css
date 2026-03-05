@@ -1,6 +1,6 @@
 html {
-  /*background: #26282f;*/
-  background: #25323e;
+  background: #334455;
+  background: #26282f;
 }
 
 body {
@@ -10,8 +10,6 @@ body {
   margin: auto;
   padding: 1em;
   line-height: 1.20em;
-
-  /*ai-- this isn't applying! It's being overwritten by the mermaid styling somehow!*/
   font-family: Optima, Candara, Calibri, Arial, sans-serif;
 }
 
@@ -116,8 +114,6 @@ pre code { background: none; }
   box-shadow: 2px 2px 5px #1f2a3555;
   padding: 0.8em;
   overflow-x: auto;
-  /*ai-- this font is applied to the pre that ends up getting turned into a mermaid diagram. it*/
-  /*font-family: Optima, Candara, Calibri, Arial, sans-serif;*/
 }
 .mermaid svg {
   max-width: 100%;
