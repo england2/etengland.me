@@ -23,7 +23,13 @@ cat $FILE | nc sb.cat-z.xyz
 
 Additionally, there is a GUI web-interface that is exposed by a plain-old webserver written in Golang.
 
-The CLI and the web-interface both talk with the same decoupled microservice which itself talks to the database. This is expressed in the diagram below.
+The CLI and the web-interface both talk with the same decoupled microservice which itself talks to the database. 
+This relationship is expressed in the diagram below.
+
+
+<!--ai--done -->
+  <!-- this part of the graph is hard to read. is there anyway to force a specific class styling on it? I want to give it white text -->
+  <!--subgraph K8s["Kubernetes: shellbin"]-->
 
 ```mermaid
 flowchart LR
@@ -36,6 +42,8 @@ flowchart LR
       DB[db-service<br/>Gin on :7272<br/>Service port 80]
       MYSQL[(MySQL)]
     end
+    class K8s k8slabel
+    classDef k8slabel color:#ffffff
 
     Browser -->|GET /, GET /paste/:path, POST /submit| WS
     Netcat -->|TCP paste content| NC
@@ -53,7 +61,7 @@ The main goal was to implement a full CI/CD developement pipeline for microservi
 
 This includes building the testing the microservice binary entrypoints (golang unit test).
 
-Read the [full post here](/shellbin/) for more details.
+Read the [full write here](/shellbin/) for more details.
 
 <br>
     
