@@ -21,7 +21,7 @@ menu:
 
 params:
   description: "A website built through Hugo and blogdown."
-  footer: "&copy; [Elan England](https://site) 2024 -- {Year} | [Github](https://github.com/england02) | [BlueSky](https://bsky.app/profile/yihui.org)"
+  footer: "&copy; [Elan England](https://site) 2024 -- {Year} | [Github](https://github.com/england02) | [BlueSky](https://bsky.app/profile/test.com) | [X](https://test.com) | [SubStack](https://test.com)"
 
 markup:
   highlight:
