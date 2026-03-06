@@ -29,29 +29,3 @@
   font-weight: 700;
   font-display: swap;
 }
-
-body {
-  font-family: "Writer", "Courier New", Courier, monospace;
-  font-size: 0.95em;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
-  font-weight: 300;
-}
-
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
-  /*color: inherit;*/
-  text-decoration: none;
-}
-
-h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover,
-h1 a:focus, h2 a:focus, h3 a:focus, h4 a:focus, h5 a:focus, h6 a:focus {
-  /*color: inherit;*/
-  text-decoration: underline;
-}
-
-code, pre, kbd, samp {
-  font-family: "Anonymous Pro", "Courier New", "Monospace";
-  font-size: 0.98em;
-}

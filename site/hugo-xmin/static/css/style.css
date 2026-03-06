@@ -112,37 +112,41 @@ footer {
 
 /* Post index */
 .post-list {
-  margin-top: 1.25rem;
+  margin-top: 1em;
+  line-height: 0em;
+  font-family: "Anonymous Pro", "Courier New", Courier, monospace;
 }
 
 .post-list-item {
   margin: 0;
-  padding: 0.8rem 0;
+  padding: 0.25rem 0;
+  line-height: 1.35;
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
 }
 
 .index-title {
   margin: 0;
-  line-height: 1;
-}
-
-.index-title a {
-  /* color: var(--color-text-primary); */
   font-size: 1rem;
-  line-height: 0.85em;
+  line-height: inherit;
   text-decoration: none;
+  color: var(--color-text-primary);
 }
 
-.index-title a:hover,
-.index-title a:focus {
+.index-title:hover,
+.index-title:focus {
   text-decoration: underline;
 }
 
 .index-date {
-  margin: 0.2rem 0 0;
-  color: #b7c7d5;
-  font-size: 1rem;
-  line-height: 0.85em;
+  margin: 0;
+  color: var(--color-text-muted);
+  opacity: 0.65;
+  font-size: 0.92rem;
+  line-height: inherit;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 /* Footer */
@@ -152,7 +156,7 @@ footer {
 
 footer a {
   text-decoration: none;
-  color: #cbe7ff;
+  color: var(--color-text-muted);
 }
 
 /* Content elements */
@@ -229,4 +233,37 @@ thead,
 tfoot,
 tr:nth-child(even) {
   background: #3d5166;
+}
+
+/* Fonts */
+
+body {
+  font-family: "Writer", "Courier New", Courier, monospace;
+  font-size: 0.95em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  font-weight: 300;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+  /*color: inherit;*/
+  text-decoration: none;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover,
+h1 a:focus, h2 a:focus, h3 a:focus, h4 a:focus, h5 a:focus, h6 a:focus {
+  /*color: inherit;*/
+  text-decoration: underline;
+}
+
+code, pre, kbd, samp {
+  font-family: "Anonymous Pro", "Courier New", "Monospace";
+  font-size: 0.98em;
+}
+
+.menu a {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 300;
 }
