@@ -6,13 +6,19 @@
 
 {{ .Content }}
 
+<!-- ai--done change this to a sprase anonymous pro list with consistent linespaciung of the format:
+<name> <date>
+where date is fainter text
+-->
 <div class="post-list">
+    <hr>
+    <h3> All posts </h3>
   {{ $pages := .Pages }}
   {{ if .IsHome }}{{ $pages = .Site.RegularPages }}{{ end }}
   {{ range (where $pages "Section" "!=" "") }}
   <article class="post-list-item">
-    <h2 class="index-title"><a href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a></h2>
-    <h3 class="index-date">{{ .Date.Format "2006/01/02" }}</h3>
+    <time class="index-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006/01/02" }}</time>
+    <a class="index-title" href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a>
   </article>
   {{ end }}
 </div>
