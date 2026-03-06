@@ -1,5 +1,5 @@
 ---
-title: A Plain Markdown Post
+title: A Plan Markdown Post
 author: Yihui Xie
 date: '2016-02-14'
 categories:
