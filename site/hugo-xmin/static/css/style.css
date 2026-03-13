@@ -23,7 +23,7 @@ html::before {
   background-image: url("/images/noise.webp");
   background-repeat: repeat;
   background-size: 180px 180px;
-  opacity: 0.02;
+  opacity: 0.01;
   mix-blend-mode: soft-light;
   z-index: 0;
 }
@@ -31,7 +31,7 @@ html::before {
 body {
   position: relative;
   z-index: 1;
-  background: #00000012;
+  background: #00000006;
   color: #fceff4;
   max-width: 800px;
   margin: auto;
@@ -46,13 +46,6 @@ main {
 
 /* Global links */
 a {
-  /*ai--done set a link-color variable for this hex, and use that variable in all locations.
-
-  in fact, in anyplace a hex color is repeated, create an well-named variable and use that for everything
-
-  place vars the very top
-
- */
   color: var(--color-link-primary);
 }
 
@@ -152,6 +145,7 @@ footer {
 /* Footer */
 footer {
   color: var(--color-text-muted);
+  font-family: "Anonymous Pro", "Courier New", Courier, monospace;
 }
 
 footer a {
@@ -181,7 +175,6 @@ video {
 pre {
   background: var(--color-surface-code);
   border: 1px solid #2e3943;
-  box-shadow: 2px 2px 5px var(--color-shadow-soft);
   padding: 1em;
   overflow-x: auto;
 }
@@ -203,7 +196,6 @@ pre code {
 .mermaid {
   background: #ffffff09;
   border: 1px solid #272822;
-  box-shadow: 2px 2px 5px var(--color-shadow-soft);
   padding: 0.8em;
   overflow-x: auto;
 }
@@ -245,6 +237,8 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
   font-weight: 300;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
 }
 
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {

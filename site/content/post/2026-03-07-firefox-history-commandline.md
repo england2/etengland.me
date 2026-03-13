@@ -19,7 +19,7 @@ Here's a quick and dirty fish script that allows you to print your browsing hist
 set src $HOME/.mozilla/firefox/hogh53e4.default-release
 set tmp $XDG_RUNTIME_DIR/places_copy.sqlite
 
-# Default behavior is like a shell's `history` command; just p
+# Default behavior is like most shell's `history` command; just print everything
 set -l like_query '.'
 set -l limit '-1'
 

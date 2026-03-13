@@ -7,6 +7,10 @@ title: Home
 <br >
     
 This site has:
+
+
+<!--ai-- resume leads to file named resume.pdf -->
+
 - My [resume](/resume/).
 - [All articles](/all-posts/) about various technical topics.
 -  Write-ups about some personal projects I've completed (see below).
@@ -70,12 +74,18 @@ Webterm is a system that allows users to access Unix machines from their web bro
 
 I wrote this project because I wanted to do something in Kubernetes that sounded really interesting and a bit intimidating. Basically, my goal was to write Go code to interact with the Kubernetes API to create, destroy, and scale pods based on user load, and assign each pod to a user.
 
-This project was out of my comfort zone and the source code reflects that. Despite that, it actually works!
-Building something to process actually data coming from Kubernetes instead of using a pre-built solution taught me a about how to Kubernetes API works.
+This project was out of my comfort zone and the source code reflects that. 
+Despite that, it actually works!
+
+Building something to process Kubernetes API data myself instead of using a pre-built solution taught me a bit about Kubernetes and Go.
 
 It also allowed me to implement some very neat and famous concurrency patterns in golang.
 
-Here's the main concurrent runner of the component that reads from the Kubernetes API to scale pods.
+
+The most interesting part is the following code, which is a essentially a concurrent process watcher that can respond to updates from the pod-scaling system. (TODO fix this explanation)
+
+A commented version of this code is available in the project write-up.
+
 
 ```go
 	for {
@@ -84,10 +94,7 @@ Here's the main concurrent runner of the component that reads from the Kubernete
 			fil.params = append(fil.params, &paramToAppend)
 			fmt.Printf("params: %v\n", fil.params)
 		case indexToRemove := <-fil.remIndexChan:
-			fmt.Printf("removing filterParam %v\n", fil.params[indexToRemove].desc) //t
-			fmt.Println(fil.params)                                                 //t
 			fil.params = remove(fil.params, indexToRemove)
-			fmt.Println(fil.params) //t
 		case event := <-fil.inChan:
 			for _, fp := range fil.params {
 				if fp.pass(event, fil.done) {
@@ -98,7 +105,6 @@ Here's the main concurrent runner of the component that reads from the Kubernete
 			return
 		default:
 			if len(fil.params) == 0 {
-				fmt.Println("len(fil.params) == 0. closing filter") //t
 				close(fil.done)
 				runningFilter = nil
 			}
@@ -108,16 +114,12 @@ Here's the main concurrent runner of the component that reads from the Kubernete
 
 This concurrency pattern is called a "for select loop", which I read about in the very fun book [Concurrency in Go](https://katherine.cox-buday.com/concurrency-in-go/) by Katherine Cox-Buday.
 
-The code is sort of a mess, but I think it's very funny that it's a mess that _actually works._
-
-There's a lot involved in the project:
-- Helm charts to deploy various components
-- Website frontend that emulates a terminal.
+There's a quite a bit involved in this project:
+- Website frontend that emulates a terminal, and client-side JS to request a new Unix machine container from the Kubernetes cluster.
 - Containers to run the Unix machine that is served to clients.
 - Synchronization between pseudo-terminal hosting containers and website frontend
-- Kubernetes cluster to all components
+- Kubernetes cluster that orchestrates all containers
 - TODO
-
 
 Read the [full Webterm write-up here](/shellbin/) for more details.
 

@@ -1,9 +1,9 @@
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := preview
 
-.PHONY: preview build
-
+.PHONY: preview
 preview:
 	hugo server --themesDir . -D
 
+.PHONY: build
 build:
 	hugo --themesDir .

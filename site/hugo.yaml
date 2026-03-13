@@ -1,6 +1,6 @@
 baseurl: "https://example.org/"  # please update this to your actual URL
 languageCode: "en-us"
-title: "A minimal Hugo website"
+title: "Elan England"
 theme: "hugo-xmin"
 googleAnalytics: ""
 disqusShortname: ""
