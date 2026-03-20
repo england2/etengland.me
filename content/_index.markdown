@@ -2,21 +2,14 @@
 title: Home
 ---
 
-# Elan England's Website
+# Elan Thomas England
 
-<br >
-    
-This site has:
+This is a portfolio website that discusses some projects I've built.
 
-
-<!--ai--done resume leads to file named resume.pdf -->
-
-- My [resume](/resume.pdf).
-- [All articles](/all-posts/) about various technical topics.
--  Write-ups about some personal projects I've completed (see below).
+Scroll down to read an introduction to each project, and click the heading to see the full write-up.
 
 <br>
-
+    
 ## [Shellbin](/shellbin/)
 <hr>
 
@@ -59,9 +52,18 @@ flowchart LR
 
 In total, there are 4 discrete container images involved in this project: A web server, a database service, a netcat-receiving-server, and the MySQL database container.
 
-As mentioned, the main goal was to implement a full CI/CD developement pipeline for these microservices.
+As mentioned, the main goal of this project was to experiment with a developement pipeline for these microservices.
 
-The CI/CD pipeline includes testing and building the microservice binary entrypoints, TODO
+The CI/CD pipeline ends up being pretty simple:
+
+
+- Firstly, the shellbin's Kubernetes deployment relies on a Helm chart that is tracked by the cluster's git repository
+- Then in the shellbin repository, when we push to GitHub, our workflow:
+  - builds the container images, then pushes them to GitHub Container Registry (GHCR)
+  - clones the Kubernetes cluster's declarative git repository
+  - modifies the image tags in the Helm values chart to point to the newly pushed images
+  - commits and pushes the diff that has the new image tags
+- And then ArgoCD picks up changes and the cluster reconciles with the new images
 
 Read the [full Shellbin write-up here](/shellbin/) for more details.
 
@@ -122,20 +124,3 @@ There's a quite a bit involved in this project:
 - TODO
 
 Read the [full Webterm write-up here](/shellbin/) for more details.
-
-<br>
-    
-## [Kubernetes Cluster](/cluster/)
----
-
-My local kubernetes cluster.
-
-The cluster uses GitOps via FluxCD. This means that the cluster configuration and applications are controlled using a git repo, so you can [see the source code of the cluster here.](https://github.com/england2/cluster)
-
-
-<img src="/images/cluster.png" alt="Kubernetes cluster test bench" style="width: 50%; display: block; margin: 0 auto;">
-
-### Cluster Description
-- Cluster is GitOps enabled using FluxCD
-- Grafana metrics systems
-- 24 cores and 48GB of ram over three _beastly_ dell 7060s (this would be considered high performance computing back in the 80s.)
