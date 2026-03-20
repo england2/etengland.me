@@ -21,6 +21,7 @@ jobs:
       DART_SASS_VERSION: 1.98.0
       GO_VERSION: 1.26.1
       HUGO_VERSION: 0.158.0
+      HUGO_BASEURL: https://www.et-england.xyz/
       NODE_VERSION: 24.14.0
       TZ: Europe/Oslo
     steps:
@@ -82,7 +83,7 @@ jobs:
           hugo build \
             --gc \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/" \
+            --baseURL "${{ env.HUGO_BASEURL }}" \
             --cacheDir "${{ runner.temp }}/hugo_cache"
       - name: Cache save
         id: cache-save
