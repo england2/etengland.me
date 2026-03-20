@@ -20,12 +20,12 @@ menu:
     - name: Home
       url: ""
       weight: 1
-    - name: All Work
-      url: "work"
+    # - name: All Work
+    #   url: "work"
 
 params:
-  description: "A website built through Hugo and blogdown."
-  footer: "&copy; [Elan England](https://site) 2024 -- {Year} | [Github](https://github.com/england02) | [BlueSky](https://bsky.app/profile/test.com) | [X](https://test.com) | [SubStack](https://test.com)"
+  description: "Portfolio website."
+  footer: "&copy; [Elan England](https://et-england.xyz) {Year} | [Github](https://github.com/england2)"
 
 markup:
   highlight:
