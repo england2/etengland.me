@@ -4,11 +4,11 @@ date = 2026-03-07
 slug = "firefox-history-cli"
 +++
 
-Firefox stores your browser history in a `sqlite` file.
+Firefox stores your browser history in a `.sqlite` file.
 
 Therefore, it's pretty easy to script!
 
-Here's a quick and dirty fish script that allows you to print your browsing history on the command line, similar to the builtin `history` command in most shells.
+Here's a quick fish script that allows you to print your browsing history on the command line, similar to the builtin `history` command in most shells.
 
 ## ~/bin/ff-history
 
@@ -107,7 +107,7 @@ LIMIT $limit;
 resulting in
 
 ```fish
-~ % ff-history-cool sean 5
+~ % ff-history sean 5
 https://www.seangoedecke.com/is-ai-wrong/|Is using AI wrong? A review of six popular anti-AI arguments||0
 https://www.seangoedecke.com/party-tricks/|Crushing JIRA tickets is a party trick, not a path to impact||0
 https://www.seangoedecke.com/ratchet-effects/|Ratchet effects determine engineer reputation at large companies||0
