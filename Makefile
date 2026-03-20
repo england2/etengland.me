@@ -2,8 +2,8 @@
 
 .PHONY: preview
 preview:
-	hugo server --themesDir . -D
+	hugo server -D
 
 .PHONY: build
 build:
-	hugo --themesDir .
+	hugo
