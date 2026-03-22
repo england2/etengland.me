@@ -7,7 +7,9 @@
   --color-border-table: #9fb3c8;
   --color-surface-code: #27282290;
   --color-shadow-soft: #1f2a3555;
+  --color-rose-pine-code-background: #191724;
 }
+
 
 /* Page shell */
 html {
@@ -91,6 +93,8 @@ footer {
   padding: 0;
 }
 
+/* hmm */
+
 .article-meta h2 {
   margin-bottom: 0.2rem;
   font-size: 1.2rem;
@@ -102,6 +106,18 @@ footer {
   color: var(--color-text-muted);
   font-size: 0.92rem;
   font-weight: 400;
+}
+
+/* h settings */
+
+/*h2 {
+  margin-bottom: 0.2rem;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}*/
+
+h3 {
+  font-size: 1.18rem;
 }
 
 /* Post index */
@@ -254,7 +270,37 @@ h1 a:focus, h2 a:focus, h3 a:focus, h4 a:focus, h5 a:focus, h6 a:focus {
   text-decoration: underline;
 }
 
-code, pre, kbd, samp {
+/* inline backtick code */
+p > code,
+li > code,
+li p > code,
+blockquote > p > code,
+td > code,
+th > code {
+  font-family: "Anonymous Pro", "Courier New", "Monospace";
+  background: var(--color-rose-pine-code-background);
+  padding: 0.1rem 0.22rem;
+  font-size: 1.05em;
+}
+
+
+
+/* inline code links only */
+a > code,
+a code {
+  font-family: "Anonymous Pro", "Courier New", monospace;
+  background: var(--color-rose-pine-code-background);
+  color: var(--color-link-primary);
+  padding: 0.1rem 0.22rem;
+  font-size: 1.05em;
+}
+
+
+/* code blocks */
+pre,
+pre code,
+kbd,
+samp {
   font-family: "Anonymous Pro", "Courier New", "Monospace";
   font-size: 0.98em;
 }
