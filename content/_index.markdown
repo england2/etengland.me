@@ -20,15 +20,40 @@ It's named shellbin because it's a pastebin clone that you can access with your 
 cat $FILE | nc sb.cat-z.xyz
 ```
 
-Users can also create pastes with a web front-end written in Go (which uses Server Side Rendering).
+Users can also create pastes using a web front-end written in Go that uses server-side rendering.
 
-<br>
+The CLI and the web front-end both talk with the same decoupled microservice which itself talks to the database. 
+This relationship is expressed in the diagram below.
 
-In total, there are 4 distinct container images involved in this project: A web server, a database service, a netcat-receiving-server, and the MySQL database container.
+```mermaid
+flowchart LR
+    Browser[Browser / HTTP client]
+    Netcat[Netcat / TCP client]
 
-As mentioned, the main goal of this project was to implement a developement pipeline for these microservices.
+    subgraph K8s["Kubernetes"]
+      WS[webserver<br/>Gin on :4747<br/>Service port 80]
+      NC[nc-server<br/>TCP on :6262<br/>Service targetPort 6262]
+      DB[db-service<br/>Gin on :7272<br/>Service port 80]
+      MYSQL[(MySQL)]
+    end
+    class K8s k8slabel
+    classDef k8slabel color:#ffffff 
 
-The pipeline ends up being pretty simple.
+    Browser -->|GET /, GET /paste/:path, POST /submit| WS
+    Netcat -->|TCP paste content| NC
+
+    WS -->|HTTP POST /processInput| DB
+    WS -->|HTTP POST /servePaste| DB
+    NC -->|HTTP POST /processInput| DB
+
+    DB -->|SQL queries to pastes table| MYSQL
+```
+
+In total, there are 4 discrete container images involved in this project: A web server, a database service, a netcat-receiving-server, and the MySQL database container.
+
+As mentioned, the main goal of this project was to experiment with a developement pipeline for these microservices.
+
+The CI/CD pipeline ends up being pretty simple.
 
 - First, shellbin's Kubernetes manifests are sourced from a Helm chart that is tracked by ArgoCD
   - ArgoCD makes sure that the most recent version's of the applications manifests are deployed
@@ -37,7 +62,7 @@ The pipeline ends up being pretty simple.
   - clones the Kubernetes cluster's declarative gitop repository
   - modifies the image tags in the Helm Chart's values.yml so they point to the newly pushed images
   - commits and pushes the diff that has the new image tags to cluster's configuration repo
-- And then ArgoCD picks up changes and the cluster deploys any updates to the container images and Helm Chart
+- And then ArgoCD picks up changes and the cluster deploys updates to the container images and Helm Chart
 
 Read the [full Shellbin write-up here](/shellbin/) for more details.
 
@@ -46,42 +71,48 @@ Read the [full Shellbin write-up here](/shellbin/) for more details.
 ## [Webterm](/webterm/)
 ---
 
+<br>
+    
+<img src="/images/webterm1.png" alt="Webterm demo" style="width: 70%; display: block; margin: 0 auto;">
+
+<br>
+
 Webterm is a system that allows users to access Unix machines from their web browser.
 
-Of note is that there's a binary that allocates and exposes backend terminal instances automatically.
+Here are some of the moving-pieces involved with this project:
+- Website frontend that visually emulates a terminal in the browser
+- Client-side JavaScript that requests a terminal assignment from the backend
+- Client-side JavaScript that connects the browser to the selected terminal pod
+- Go service that tracks which terminal pods are free, in use, or being recreated
+- Go service that creates new capacity when the spare terminal pool runs out
+- Container image that runs the Linux shell environment exposed to users through node-pty
 
-Here's a horrific piece of code which is what happens when you to try interact with the raw Kubernetes API instead of just using [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder).
+Of note is the Go binary `pseudo-terminal-manager` that allocates and exposes backend terminal instances programmatically.
+
+Here's a horrible/neat piece of code from it that helps us filter Kubernetes API events to see when new pods are available.
 
 ```go
-	for {
-		select {
-		case paramToAppend := <-fil.paramStream:
-			fil.params = append(fil.params, &paramToAppend)
-			fmt.Printf("params: %v\n", fil.params)
-		case indexToRemove := <-fil.remIndexChan:
-			fil.params = remove(fil.params, indexToRemove)
-		case event := <-fil.inChan:
-			for _, fp := range fil.params {
-				if fp.pass(event, fil.done) {
-					fp.outChan <- event
-				}
-			}
-		case <-fil.done:
-			return
-		default:
-			if len(fil.params) == 0 {
-				close(fil.done)
-				runningFilter = nil
-			}
-		}
-	}
+for {
+    select {
+    case paramToAppend := <-fil.paramStream:
+        fil.params = append(fil.params, &paramToAppend)
+    case indexToRemove := <-fil.remIndexChan:
+        fil.params = remove(fil.params, indexToRemove)
+    case event := <-fil.inChan:
+        for _, fp := range fil.params {
+            if fp.pass(event, fil.done) {
+                fp.outChan <- event
+            }
+        }
+    case <-fil.done:
+        return
+    default:
+        if len(fil.params) == 0 {
+            close(fil.done)
+            runningFilter = nil
+        }
+    }
+}
 ```
 
-Terrible! And kind of cool.
-
-Here are some of the moving-pieces involved with this project:
-- Website frontend that emulates a terminal, and client-side JS to request a new Unix machine container from the Kubernetes cluster.
-- Containers to run the Unix machine that is served to clients.
-- Synchronization between pseudo-terminal hosting containers and website frontend
-
-Read the [full Webterm write-up here](/shellbin/) for more details.
+Read the [full Webterm write-up here](/webterm/) for more details.
