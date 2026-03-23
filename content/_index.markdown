@@ -84,32 +84,6 @@ Here are some of the moving-pieces involved with this project:
 - Go service that creates new capacity when the spare terminal pool runs out
 - Container image that runs the Linux shell environment exposed to users through node-pty
 
-Of note is the Go binary `pseudo-terminal-manager` that allocates and exposes backend terminal instances programmatically.
-
-Here's a horrible/neat piece of code from it that helps us filter Kubernetes API events to see when new pods are available.
-
-```go
-for {
-    select {
-    case paramToAppend := <-fil.paramStream:
-        fil.params = append(fil.params, &paramToAppend)
-    case indexToRemove := <-fil.remIndexChan:
-        fil.params = remove(fil.params, indexToRemove)
-    case event := <-fil.inChan:
-        for _, fp := range fil.params {
-            if fp.pass(event, fil.done) {
-                fp.outChan <- event
-            }
-        }
-    case <-fil.done:
-        return
-    default:
-        if len(fil.params) == 0 {
-            close(fil.done)
-            runningFilter = nil
-        }
-    }
-}
-```
+The most notable aspect is the project's terminal manager written in Go, `pseudo-terminal-manager`, which allocates and exposes backend terminal instances programmatically via the Kubernetes API.
 
 Read the [full Webterm write-up here](/webterm/) for more details.
