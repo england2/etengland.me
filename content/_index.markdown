@@ -10,7 +10,6 @@ Scroll down to read an introduction to each project, and click the heading to se
 
     
 ## [Shellbin](/shellbin/)
-<hr>
 
 Shellbin is a microservice architecture project that I built to exercise my understanding of CI/CD for cloud-native applications.
 
@@ -66,7 +65,6 @@ Read the [full Shellbin write-up here](/shellbin/) for more details.
 <br>
     
 ## [Webterm](/webterm/)
----
 
 <br>
     

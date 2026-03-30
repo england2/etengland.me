@@ -30,7 +30,7 @@ params:
 markup:
   highlight:
     codeFences: true
-    style:  rose-pine
+    style: nord
   goldmark:
     renderer:
       unsafe: true
