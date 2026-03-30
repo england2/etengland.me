@@ -9,7 +9,8 @@
   --color-link-hover: #a6c8ff;
   --color-code-bg: #202020;
   --color-quote-accent: #08bdba;
-  --page-width: 44rem;
+  /*--page-width: 44rem;*/
+  --page-width: 50rem;
 }
 
 html {
@@ -25,8 +26,8 @@ body {
   padding: 2.75rem 1.5rem 4rem;
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
-  font-size: 1.02rem;
+  font-family: "Sans";
+  /*font-size: 1.02rem;*/
   line-height: 1.75;
   text-rendering: optimizeLegibility;
 }
