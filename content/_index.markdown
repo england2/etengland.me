@@ -4,7 +4,7 @@ title: Home
 
 # Elan Thomas England
 
-Welcome to my site! This is a simple portfolio site which discusses some projects that I that I've built.
+Welcome to my site! This is a simple portfolio site which discusses some projects that I've built.
 
 Scroll down to read an introduction to each project, and click the heading to see the full write-up.
 
