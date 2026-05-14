@@ -9,37 +9,37 @@ hidden_from_all_posts = false
 
 <br>
 
-# Source Code!
+
+## Source Code!
+
+
+
+## Source Code!
 
 https://github.com/england2/aws-demo/
 
 ## Overview
 
-The Agent Conductor is responsible for scheduling and managing agents in reaction to AWS platform incidents and tickets.
+The Agent Conductor is responsible for scheduling and managing agents in reaction to tickets and AWS platform incidents.
 
-The basic idea is that the conductor is the control process. It does not do the agent's work itself. Instead, it watches for inputs, decides whether an agent should be started, prepares the agent's task files, and then starts a worker.
+The basic idea is that the conductor is the control process. It does not do the agent's work itself, and onstead watches for inputs, decides whether an agent should be started, prepares the agent's task files, and then starts a worker.
 
 At a high level, here is how this project works:
 
-- Tickets and CloudWatch alarms pushed to an SQS queue.
-- The conductor periodically polls SQS for new inputs.
+- Tickets and CloudWatch alarms pushed to an SQS queue which the conductor polls for new work
 - When the conductor gets new SQS messages, it passes the messages to the scheduler routine:
     - The scheduler places all tickets and incident alarms into an internal database
-    - The scheduler relates new messages to old messages, determining if a job has already been spawned for the ticket or for incident messaging relating to an ongoing incident.
+    - The scheduler relates new messages to old messages, determining if a job has already been spawned for the ticket or for incident messaging relating to an ongoing incident
     - The scheduler routine returns to main with a decision whether or not to spawn an agent
-- The conductor interprets the decision and if necesarry spawns an agent.
-- The agent worker connects back to the conductor over gRPC.
-- The conductor sends the worker its task files.
-- The worker runs Codex, does the requested work, and uploads its results back to the conductor.
+- The conductor interprets the decision and if necesarry spawns an agent
+- The agent worker connects back to the conductor over gRPC
+- The conductor sends the worker its task files
+- The worker runs Codex, does the requested work, and submits its changes to github
 
 The conductor currently handles two kinds of inputs:
 
-- Tickets, which are already clear units of work.
-- CloudWatch alarms, which may need to be grouped together so we do not spawn too many agents during one incident.
-
-The main reason for the conductor to exist is that spawning agents is not just "run a container." The conductor also needs to decide when to spawn, what context the agent should receive, which files the agent should start with, and how to keep multiple workers separated from each other.
-
-In short, the conductor is trying to be a small control plane for agent work.
+- Tickets, which always spawn a job
+- CloudWatch alarms, which may need to be grouped together so we do not spawn too many agents during one incident
 
 # Database Scheduling System
 
@@ -53,9 +53,9 @@ Here is how both work.
 - The conductor receives a ticket from SQS, sourced from something like Jira.
 - The scheduler stores the ticket in the database.
 - If the ticket has not already been scheduled, the scheduler tells main to spawn one agent for it.
-- If the ticket has been scheduled already, there no agent spawns.
+- If the ticket has been scheduled already, then no agent spawns.
 
-Ticket scheduling is the simple case. Basically, the only point of the database here is to prevent repeating work.
+Ticket scheduling is more simple than incident scheduling. Basically, the only point of the database here is to prevent repeating work.
 
 <br>
 
@@ -85,11 +85,11 @@ The database is useful because it lets the conductor remember what has already b
 ## Improved Program Testability With Database Scheduling
 Deciding when to spawn an agent *and* with what context, permissions, repos, prompts, etc. to provide the agent with is an extremely important part of the program. Agent scheduling mistakes may include spawning too many agents or spawning agents that don't have the proper context/permissions to do their job. 
 
-Scheduling mistakes will likely incur costly penalties, some of which include:
-- Wasting engineer hours on reviewing diffs that shouldn't exist in the first place (happens if we spawn too many agents; agents with weak context)
-- Wasting money on fargate instances (too many agents)
-- Delayed execution of legimate agent work (too many agents)
-- Agent PR merge issues and repeated work (repo-claiming subsystem doesn't work; multiple agents for alarms)
+**It's important to get scheduling mistakes right, as badly scheduled agents will likely produce these kinds of penatlies:**
+  - Wasting engineer hours on reviewing diffs that shouldn't exist in the first place (happens if we spawn too many agents; agents with weak context)
+  - Wasting money on fargate instances (too many agents)
+  - Delayed execution of legimate agent work (too many agents)
+  - Agent PR merge issues and repeated work (repo-claiming subsystem doesn't work; multiple agents for alarms)
 
 Therefore, we want to make sure we get agent scheudling right.
 
