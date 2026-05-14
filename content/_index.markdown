@@ -2,6 +2,16 @@
 title: Home
 ---
 
+
+# (Working Copy) Conductor Writeup
+
+{{< heading-with-icon
+  text="Agent Conductor"
+  href="/conductor/"
+  icon_href="https://github.com/england2/aws-demo/"
+>}}
+
+
 # Elan Thomas England
 
 Welcome to my site! This is a simple portfolio site which discusses some projects that I've built.

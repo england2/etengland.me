@@ -1,0 +1,5 @@
+#!/usr/bin/env fish
+source /home/t/.config/fish/global.fish
+
+owl localhost:1313_.weblink
+b hugo server

@@ -1,0 +1,23 @@
+{{ partial "header.html" . }}
+
+{{ if not .IsHome }}
+<h1>{{ .Title | markdownify }}</h1>
+{{ end }}
+
+{{ .Content }}
+
+<div class="post-list">
+    <hr>
+    <h3> All posts </h3>
+  {{ $pages := .Pages }}
+  {{ if .IsHome }}{{ $pages = .Site.RegularPages }}{{ end }}
+  {{ $listedPages := where (where $pages "Section" "!=" "") "Params.hidden_from_all_posts" "ne" true }}
+  {{ range $listedPages }}
+  <article class="post-list-item">
+    <time class="index-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006/01/02" }}</time>
+    <a class="index-title" href="{{ .RelPermalink }}">{{ .Title | markdownify }}</a>
+  </article>
+  {{ end }}
+</div>
+
+{{ partial "footer.html" . }}

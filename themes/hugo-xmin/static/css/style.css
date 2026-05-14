@@ -112,6 +112,16 @@ h3 {
   font-size: 1.2rem;
 }
 
+h3,
+h4,
+h5,
+h6 {
+  text-decoration: underline;
+  text-decoration-color: rgba(242, 244, 248, 0.20);
+  text-decoration-thickness: 0.01em;
+  text-underline-offset: 0.40em;
+}
+
 h1 a,
 h2 a,
 h3 a,
@@ -179,7 +189,7 @@ video {
   max-width: 100%;
   height: auto;
   margin: 1.75rem auto;
-  border: 1px solid var(--color-border);
+  border: 0px solid var(--color-border);
 }
 
 blockquote {
@@ -214,6 +224,7 @@ footer {
   font-weight: 400;
   font-family: "Noto Sans Mono", "Anonymous Pro", ui-monospace, monospace;
   font-size: 1.00rem;
+  text-decoration: none;
 }
 
 .post-list {
@@ -228,6 +239,7 @@ footer {
   font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .post-list-item {
