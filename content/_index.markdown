@@ -7,7 +7,7 @@ title: Home
 Welcome to my page! This is a small portfolio site which discusses some projects that I've built.
 
 Scroll down to read an introduction to each project, and click the heading to see the full write-up.
-
+<!--
 <br>
 
 {{< heading-with-icon
@@ -20,8 +20,7 @@ Agent Conductor is a system to spawn and manage agents on AWS which solve ticket
 
 > - Note: This project is in active development and the writeup may be outdated compared to the source code!
 > - Note #2: The source code needs refactoring; Beware all ye who enter.
-
-
+-->
 <br>
 
 
