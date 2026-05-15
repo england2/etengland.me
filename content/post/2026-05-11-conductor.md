@@ -30,7 +30,7 @@ At a high level, here is how this project works:
 - The conductor interprets the decision and if necessary spawns an agent
 - The agent worker connects back to the conductor over gRPC
 - The conductor sends the worker its task files
-- The worker runs Codex, does the requested work, and submits its changes to github
+- The worker runs Codex, does the requested work, and submits its changes to GitHub.
 
 The conductor currently handles two kinds of inputs:
 
@@ -39,7 +39,7 @@ The conductor currently handles two kinds of inputs:
 
 # Database Scheduling System
 
-The conductor is responsible for deciding *when* to schedule an agent to run, in addition to *what type* of agent it will be, e.g,!! an incident response or a ticket worker.
+The conductor is responsible for deciding *when* to schedule an agent to run, in addition to *what type* of agent it will be, e.g. an incident response or a ticket worker.
 
 So far, there are two types of scheduling that the conductor can perform, which are ticket scheduling and incident scheduling, which spawn the two worker types above.
 
@@ -80,10 +80,11 @@ The database is useful because it lets the conductor remember what has already b
 Deciding when to spawn an agent *and* with what context, permissions, repos, prompts, etc. to provide the agent with is an extremely important part of the program. Agent scheduling mistakes may include spawning too many agents or spawning agents that don't have the proper context/permissions to do their job. 
 
 **It's important to get scheduling mistakes right, as badly scheduled agents will likely produce these kinds of penalties:**
-  - Wasting engineer hours on reviewing diffs that shouldn't exist in the first place (happens if we spawn too many agents; agents with weak context)
+  - Wasting engineer hours on reviewing repeated diffs (happens if we spawn too many agents per incident)
+  - Wasting engineer hours on reviewing broken/failed jobs (agents with weak context and incomplete execution environments)  
+  - Avoidedble agent merge issues (repo-claiming subsystem doesn't work; too many agents per incident)
   - Wasting money on fargate instances (too many agents)
   - Delayed execution of legitimate agent work (too many agents)
-  - Agent PR merge issues and repeated work (repo-claiming subsystem doesn't work; multiple agents for alarms)
 
 Therefore, we want to make sure we get agent scheduling right.
 
@@ -102,39 +103,33 @@ Notably, one could use old, existing system data to test scheduling in addition 
 >
 > For this reason, I'm interested in getting a rock solid base program with well-tested subsystems (e.g,!! git/platform permissions, multi-AWS account complexity sorted out, repo-claiming, etc.) *before* trying to implement potentially complex incident-based scheduling that may rely on OTel, CloudWatch, and other data to make decisions.
 >
-> In short, the v1 production conductor would only respond to tickets. This would allow time to iron-out!! the system's fundamentals while it still has predictable ticket-only scheduling and the stakes/penalties are generally lower.
+> In short, the v1 production conductor would only respond to tickets. This would allow time to iron out the system's fundamentals while it still has predictable ticket-only scheduling and the stakes/penalties are generally lower.
 >
-> Additionally, note that while the current scheduling logic is very simple, in production the scheduling step would likely expand!! subsystems could include:
-> - A repo-claiming system to prevent two agents from simultaneously working on the same codebase, thus removing the possibility of agent-to-agent merge conflicts
-> - A dev-container system to ensure that the agent will run it's!! main worker binary on the best possible execution environment possible.
-> A context-reuse system to allow agents to reuse their old memories of the familar!! codebases rather than having them spend many tokens to just get their bearings on each spawn.
-> A permissions system to ensure that agents have read-only access to AWS CLI tools that can help with their work.
+> Finally, while the current scheduler may seem too simple to necessitate robust testing, note that the production scheduling step could expand into these subsystems or features:
+> - A repo-claiming system to prevent two agents from simultaneously working on the same codebase, thus removing easily avoided merge conflicts
+> - A dev-container system to ensure that the agent will run its main worker binary on the best possible execution environment possible.
+> - A context-reuse system to allow agents to reuse their old memories of familiar codebases rather than wasting many tokens getting their bearings on every spawn.
+> - A job retry system.
+> - A multi-account scheduler that could allow agents to diagnose and inspect incidents regarding multi-account connectivity and logic.
 
-
-
-# Deployment Process
-
+# Conductor Deployment Process
 We want to be able to update the conductor while it's deployed without orphaning the workers it manages. 
 
-Basically, we can't just kill the server and restart it while there are active jobs.
+In other words, we can't kill the server and restart it while there are still active jobs.
 
 To solve this, the deployment pipeline and conductor do two things:
 1. After the pipeline activates, the conductor will stop accepting new jobs.
 2. The conductor does not shut down until the agents it is managing are finished with their work.
 
-Here's the rough overview:
+We achieve this using a simple system described below.
 
-## Conductor Deployment Process Summary
-The conductor uses very simple inter-process communication to start the shutdown routine when instructed by the CI, and also to report when its!! shut down safely: We literally just write specific files to the file system that are interpreted by the conductor and its deployment script.
+## Conductor Safe Shutdown Gate
+The main logic units of the conductor all run in goroutines, which on their own do not prevent the program from returning from main and exiting.
 
-With that said, here's the rough order of events.
+The conductor process stays open by maintaining a shutdown gate, which is just a for loop with a few conditionals.
+The conductor watches a file called `IS_CONDUCTOR_SHUTTING_DOWN` which starts as `false`. When we deploy a new version of a conductor, the deployment process flips this file to true, and the conductor will not schedule new jobs, allowing them to safely pool in the SQS queue.
 
-- The conductor is deployed onto a stable EC2 instance using Docker
-- The EC2 instance itself holds scripts that restart and update the conductor
-- The conductor deploy pipeline uses AWS's SSM to activate these scripts 
-- The deploy script flips the watched file `IS_CONDUCTOR_SHUTTING_DOWN` to true.
-  - Now, the conductor will not accept any more jobs.
-- The conductor waits for its jobs to finish, writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, and the deploy script restarts the new conductor version.
+After the!! point, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
 
 <!-- 
 
