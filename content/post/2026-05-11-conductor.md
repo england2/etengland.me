@@ -129,7 +129,7 @@ The main logic units of the conductor all run in goroutines, which on their own 
 The conductor process stays open by maintaining a shutdown gate, which is just a for loop with a few conditionals.
 The conductor watches a file called `IS_CONDUCTOR_SHUTTING_DOWN` which starts as `false`. When we deploy a new version of a conductor, the deployment process flips this file to true, and the conductor will not schedule new jobs, allowing them to safely pool in the SQS queue.
 
-After the!! point, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
+After this point, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
 
 <!-- 
 
