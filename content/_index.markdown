@@ -4,7 +4,7 @@ title: Home
 
 # Elan Thomas England
 
-Welcome to my site! This is a simple portfolio site which discusses some projects that I've built.
+Welcome to my page! This is a small portfolio site which discusses some projects that I've built.
 
 Scroll down to read an introduction to each project, and click the heading to see the full write-up.
 
@@ -16,7 +16,7 @@ Scroll down to read an introduction to each project, and click the heading to se
   icon_href="https://github.com/england2/aws-demo/"
 >}}
 
-Agent Conductor is a system to spawn and manage agents on AWS to solve tickets and investigate CloudWatch alarms/other anomalies.
+Agent Conductor is a system to spawn and manage agents on AWS which solve tickets and investigate CloudWatch alarms and other anomalies.
 
 > - Note: This project is in active development and the writeup may be outdated compared to the source code!
 > - Note #2: The source code needs refactoring; Beware all ye who enter.
