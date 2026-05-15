@@ -148,7 +148,7 @@ After the file is set to `true`, the shutdown gate counts the number of active w
 >
 > Is it desirable for an agent to be deployed to investigate an issue regarding the boundary and connection of multiple accounts?
 >
-> If so, existing maps of inter-account connectivity would be useful to help the scheduler deploy agents to separate repositories that express network connections between one another.
+> If so, existing maps of inter-account connectivity would be useful to help the scheduler deploy agents to separate repositories whose source code expresses network connections between one another.
 
 <br>
 
