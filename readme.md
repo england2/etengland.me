@@ -1,2 +1,0 @@
-- This repository is the source for [www.etengland.me](https://www.etengland.me)
-- It's based on this Hugo theme: [xmin.yihui.org/about](https://xmin.yihui.org/about/)

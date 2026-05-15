@@ -8,18 +8,18 @@ Firefox stores your browser history in a `.sqlite` file.
 
 Therefore, it's pretty easy to script!
 
-Here's a quick fish script that allows you to print your browsing history on the command line, similar to the builtin `history` command in most shells.
+Here's a quick fish script that allows you to print your browsing history on the command line, similar to the built-in `history` command in most shells.
 
 ## ~/bin/ff-history
 
 ```fish
 #!/usr/bin/env fish
 
-# Replace `src` with your own firefox directory
+# Replace `src` with your own Firefox directory
 set src $HOME/.mozilla/firefox/hogh53e4.default-release
 set tmp $XDG_RUNTIME_DIR/places_copy.sqlite
 
-# Default behavior is like most shell's `history` command; just print everything
+# Default behavior is like most shells' `history` command; just print everything
 set -l like_query '.'
 set -l limit '-1'
 
@@ -28,7 +28,7 @@ set -q argv[1] && set -l like_query $argv[1]
 # Optional arg to only return $limit matches from the query (conserve a `head -n <x>`)
 set -q argv[2] && set -l limit $argv[2]
 
-# Copy DB, as firefox will lock this file if it's running
+# Copy DB, as Firefox will lock this file if it's running
 cp $src/places.sqlite $tmp
 
 # copy write-ahead-log if it exists
@@ -63,7 +63,7 @@ end
 
 ## Examples
 
-print your 5 most recent github page vists
+Print your 5 most recent GitHub page visits
 ```bash
 ~ % ff-history 'github' 5
 https://github.com/fsnotify/fsnotify/issues/9
@@ -74,7 +74,7 @@ https://github.com/arp242/arp242.net/issues/37
 https://github.com/arp242/arp242.net/issues/44
 ```
 
-print your top-6 favorite sites
+Print your top-6 favorite sites
 
 ```bash
 ~ % ff-history | awk -F'/' '{print $3}' | sort | uniq -c | sort -nr | head -n6

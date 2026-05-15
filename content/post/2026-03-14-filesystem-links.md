@@ -15,7 +15,7 @@ Here's a script that makes a special 'weblink' file.
 #!/usr/bin/env fish
 source /home/t/.config/fish/global.fish
 
-set url $argv[1] 
+set url $argv[1]
 set filename \
     (string sub -s 3 -e 66 \
     (string replace 'http:' '' \
@@ -57,7 +57,7 @@ owl medium.com_@siacavazzi_how-i-made-a-robust-web-scraper-d17060470.weblink
 
 ## Make it official
 
-Here's how we can weblinks recognized by `xdg` in Linux.
+Here's how we can make weblinks recognized by `xdg` in Linux.
 
 We need a desktop entry
 

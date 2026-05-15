@@ -7,7 +7,7 @@ title: Home
 Welcome to my page! This is a small portfolio site which discusses some projects that I've built.
 
 Scroll down to read an introduction to each project, and click the heading to see the full write-up.
-<!--
+
 <br>
 
 {{< heading-with-icon
@@ -18,9 +18,8 @@ Scroll down to read an introduction to each project, and click the heading to se
 
 Agent Conductor is a system to spawn and manage agents on AWS which solve tickets and investigate CloudWatch alarms and other anomalies.
 
-> - Note: This project is in active development and the writeup may be outdated compared to the source code!
-> - Note #2: The source code needs refactoring; Beware all ye who enter.
--->
+> - Note: This project is in active development. Therefore, the writeup may be desynchronized from the source code (which itself is due for refactoring and better test coverage!)
+
 <br>
 
 
@@ -53,7 +52,7 @@ flowchart LR
       MYSQL[(MySQL)]
     end
     class K8s k8slabel
-    classDef k8slabel color:#ffffff 
+    classDef k8slabel color:#ffffff
 
     Browser -->|GET /, GET /paste/:path, POST /submit| WS
     Netcat -->|TCP paste content| NC
@@ -83,7 +82,7 @@ The CI/CD pipeline ends up being pretty simple:
 Read the [full Shellbin write-up here](/shellbin/) for more details.
 
 <hr>
-    
+
 {{< heading-with-icon
   text="Webterm"
   href="/webterm/"
@@ -92,7 +91,7 @@ Read the [full Shellbin write-up here](/shellbin/) for more details.
 
 
 <br>
-    
+
 <img src="/images/webterm-web.png" alt="Webterm demo" style="width: 70%; display: block; margin: 0 auto;">
 
 <br>

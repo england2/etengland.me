@@ -1,5 +1,5 @@
 +++
-title = "Agent Conductor Discussion (Euhn Lee)"
+title = "Agent Conductor Writeup"
 date = 2026-05-11
 slug = "conductor"
 hidden_from_all_posts = false
@@ -8,7 +8,6 @@ hidden_from_all_posts = false
 <img src="/images/conductor-main.png" style="width: 100%; display: block; margin: 0 auto;">
 
 <br>
-
 
 ## Source Code!
 
@@ -98,7 +97,7 @@ Notably, one could use old, existing system data to test scheduling in addition 
 > - A dev-container system to ensure that the agent will run its main worker binary on the best possible execution environment.
 > - A context-reuse system to allow agents to reuse their old memories of familiar codebases rather than wasting many tokens getting their bearings on every spawn.
 > - A job retry system.
-> - A multi-account scheduler that could allow agents to diagnose and inspect incidents regarding multi-account connectivity and logic.
+> - A multi-account scheduler that could allow agents to diagnose and inspect incidents regarding multi-AWS-account connectivity and logic (i.e deploying a single agent to investigate two or more separate repositories whose source code expresses network connections between one another).
 
 # Conductor Deployment Process
 We want to be able to update the conductor while it's deployed without orphaning the workers it manages.
@@ -119,36 +118,18 @@ The conductor watches a file called `IS_CONDUCTOR_SHUTTING_DOWN` which starts as
 
 After the file is set to `true`, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
 
-> ## Discussion Questions, Dev Notes, Misc.
+> ## Miscellaneous Thoughts, Improvements, Etc.
+
+This section holds some thoughts not related to the primary writeup or inline.k
 
 <br>
 
-> ### Question: Usage of Tools Like Vagrant to Normalize Development Workflows at GP
-> Agents need an execution environment that contains all of the tools they need to work. For instance, agents won't be able to do their job if they lack `rustc` while working on Rust code. Additionally, they benefit from having the exact same tool versions that devs have, as well as miscellaneous scripts.
+> ### Usage of Tools Like Vagrant to Normalize Development Workflows
+> Agents benefit from a living in a runtime container that has all of the tools they need to work. For instance, agents won't be able to do their job if they lack `rustc` while working on Rust code. Additionally, they benefit from having the exact same tool versions that devs have, as well as miscellaneous scripts.
 >
-> If GP uses tools like Vagrant to normalize developer workflows, the scheduler could consume a map relating AWS accounts to their associated development environment.
+> Therefore, if each environment/repo the agent may alter uses tools like Vagrant to normalize developer workflows, the scheduler could consume a map relating AWS accounts to their associated development environment.
 >
 > Then a step could be performed to drop the worker binary onto an existing developer environment container, which could serve as the agent's execution environment.
-
-<br>
-
-> ### Question: Use Case of Singular AWS Accounts + Inter-account Connectivity
-> Does each single AWS account represent an isolated business or technology goal?
->
-> For example:
-> - One account (on all 4 environments) handles OTel exfiltration/filtering
-> - One account hosts a dashboard that displays data from OTel
-> - One account hosts GP's public-facing website
-> - etc.
->
-> My understanding of the multi-account system is that each account is conceptually similar to a Kubernetes namespace, where the broader Nova System is similar to an entire cluster.
-> What I mean is that each account defines and isolates services and servers that primarily interact with one another (as in a namespace), but largely retain the ability to interact with other accounts across the system (as in the cluster).
->
-> Regarding this project, the relevant follow-up question is:
->
-> Is it desirable for an agent to be deployed to investigate an issue regarding the boundary and connection of multiple accounts?
->
-> If so, existing maps of inter-account connectivity would be useful to help the scheduler deploy agents to separate repositories whose source code expresses network connections between one another.
 
 <br>
 
@@ -160,9 +141,7 @@ After the file is set to `true`, the shutdown gate counts the number of active w
 > - Conductor uses the AWS SDK to poll and kill the Fargate instance of workers if the worker's gRPC client can't send a handshake.
 > - General refactoring.
 > - Repo-claiming system where workers are blocked on active repositories; possibly pull unmerged PRs when they start their work after being unblocked.
-> - (OSS-related) Make bootstrap Python program to seed Terraform/other code areas with user-specific configuration.
-
-
+> - (OSS-related) Make a bootstrap Python program to seed Terraform/other code areas with user-specific configuration.
 
 <!--
 
@@ -171,5 +150,4 @@ After the file is set to `true`, the shutdown gate counts the number of active w
 gRPC is great.
 
 The conductor and worker
-
 -->
