@@ -16,10 +16,10 @@ Scroll down to read an introduction to each project, and click the heading to se
   icon_href="https://github.com/england2/aws-demo/"
 >}}
 
-Agent Conductor is a system to spawn and manage agents on AWS in to solve tickets and investigate CloudWatch alarms/other anomalies.
+Agent Conductor is a system to spawn and manage agents on AWS to solve tickets and investigate CloudWatch alarms/other anomalies.
 
 > - Note: This project is in active development and the writeup may be outdated compared to the source code!
-> - Note #2: The source code needs refactoring! Beware all ye who enter.
+> - Note #2: The source code needs refactoring; Beware all ye who enter.
 
 
 <br>

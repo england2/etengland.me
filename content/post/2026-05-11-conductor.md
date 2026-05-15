@@ -18,7 +18,7 @@ https://github.com/england2/aws-demo/
 
 The Agent Conductor is responsible for scheduling and managing agents in reaction to tickets and AWS platform incidents.
 
-The basic idea is that the conductor is the control process. It does not do the agent's work itself, and onstead watches for inputs, decides whether an agent should be started, prepares the agent's task files, and then starts a worker.
+The basic idea is that the conductor is the control process. It does not do the agent's work itself, and instead watches for inputs, decides whether to start an anagent, prepares the agent's task files, and then starts a worker.
 
 At a high level, here is how this project works:
 
@@ -27,7 +27,7 @@ At a high level, here is how this project works:
     - The scheduler places all tickets and incident alarms into an internal database
     - The scheduler relates new messages to old messages, determining if a job has already been spawned for the ticket or for incident messaging relating to an ongoing incident
     - The scheduler routine returns to main with a decision whether or not to spawn an agent
-- The conductor interprets the decision and if necesarry spawns an agent
+- The conductor interprets the decision and if necessary spawns an agent
 - The agent worker connects back to the conductor over gRPC
 - The conductor sends the worker its task files
 - The worker runs Codex, does the requested work, and submits its changes to github
@@ -51,7 +51,8 @@ Here is how both work.
 - If the ticket has not already been scheduled, the scheduler tells main to spawn one agent for it.
 - If the ticket has been scheduled already, then no agent spawns.
 
-Ticket scheduling is more simple than incident scheduling. Basically, the only point of the database here is to prevent repeating work.
+Ticket scheduling is more simple than incident scheduling. 
+Basically, the only point of the database here is to prevent repeating work.
 
 <br>
 
@@ -61,10 +62,10 @@ We're trying to spawn agents in reaction to AWS platform events, so there is sli
 *Incident scheduling:*
 - The conductor receives a CloudWatch alarm message from SQS.
 - The scheduler stores the alarm in the database.
-- The scheduler looks for other recent alarms that seem related.
-- One alarm by itself does not spawn an agent.
-- Multiple related alarms close together can become one incident.
-- If that incident has not already been scheduled, the scheduler tells main to spawn one agent for it.
+- The scheduler then determines if the alarm is "chained" to other alarms. The current logic is such that an alarm is chained if:
+  - 1. It belongs to the same group as other alarms, where groups determined by the AWS account number included in the alarm message body.
+  - 2. AND the alarm has occured within one hour as the most recent alarm in its group.
+- To schedule an agent for an incident, the scheduler must see at least two chained alarms. This means the first alarm of an incident that reaches the scheduler will not spawn an agent.
 
 Incident scheduling is more careful because alarms can arrive in bursts. If 10 alarms are all part of the same problem, we probably do not want 10 agents working on it. We want one agent with enough context to understand the ongoing incident.
 
@@ -84,7 +85,7 @@ Deciding when to spawn an agent *and* with what context, permissions, repos, pro
 **It's important to get scheduling mistakes right, as badly scheduled agents will likely produce these kinds of penatlies:**
   - Wasting engineer hours on reviewing diffs that shouldn't exist in the first place (happens if we spawn too many agents; agents with weak context)
   - Wasting money on fargate instances (too many agents)
-  - Delayed execution of legimate agent work (too many agents)
+  - Delayed execution of legitimate agent work (too many agents)
   - Agent PR merge issues and repeated work (repo-claiming subsystem doesn't work; multiple agents for alarms)
 
 Therefore, we want to make sure we get agent scheduling right.
