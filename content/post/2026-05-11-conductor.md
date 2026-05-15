@@ -25,10 +25,10 @@ At a high level, here is how this project works:
     - The scheduler places all tickets and incident alarms into an internal database
     - The scheduler uses a stable database to determine if a job has already been spawned for a ticket or an ongoing incident
     - The scheduler routine returns to main with a decision whether or not to spawn an agent
-- The conductor interprets the decision and, if necessary, spawns an agent via a container on Fargate
-- The agent's main binary entrypoint talks to the conductor via gRPC, waiting for task files that determine its job
+- The conductor interprets the decision and, if necessary, spawns a worker in a Fargate container
+- The worker's main binary talks to the conductor via gRPC, waiting for task files that determine its job
 - The conductor sends the worker its task files
-- The worker runs Codex, does the requested work, submits its changes to GitHub, and reports back to the conductor before shutting down
+- The worker starts a Codex agent, which does the requested work. After the agent finishes, the worker binary submits changes to GitHub and reports back to the conductor before exiting, ending the job and the Fargate instance.
 
 # Database Scheduling System
 
@@ -117,7 +117,7 @@ The main logic units of the conductor all run in goroutines, which on their own 
 The conductor process stays open by maintaining a shutdown gate, which is just a for loop with a few conditionals.
 The conductor watches a file called `IS_CONDUCTOR_SHUTTING_DOWN` which starts as `false`. When we deploy a new version of a conductor, the deployment process flips this file to `true`, and the conductor will not schedule new jobs, allowing messages to safely pool in the SQS queue.
 
-After the file is `false`, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
+After the file is set to `true`, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
 
 > # Dev Notes
 
