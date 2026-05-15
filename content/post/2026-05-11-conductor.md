@@ -95,7 +95,7 @@ Notably, one could use old, existing system data to test scheduling in addition 
 >
 > Finally, while the current scheduler may seem too simple to necessitate robust testing, note that the scheduling step could expand into these subsystems or features:
 > - A repo-claiming system to prevent two agents from simultaneously working on the same codebase, thus preventing easily avoided merge conflicts.
-> - A dev-container system to ensure that the agent will run its main worker binary on the best possible execution environment possible.
+> - A dev-container system to ensure that the agent will run its main worker binary on the best possible execution environment.
 > - A context-reuse system to allow agents to reuse their old memories of familiar codebases rather than wasting many tokens getting their bearings on every spawn.
 > - A job retry system.
 > - A multi-account scheduler that could allow agents to diagnose and inspect incidents regarding multi-account connectivity and logic.
