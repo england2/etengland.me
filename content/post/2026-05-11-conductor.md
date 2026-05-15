@@ -143,7 +143,7 @@ After the file is set to `true`, the shutdown gate counts the number of active w
 >
 > My understanding of the multi-account system is that each account is conceptually similar to a Kubernetes namespace, where the broader Nova System is similar to an entire cluster.
 > What I mean is that each account defines and isolates services and servers that primarily interact with one another (as in a namespace), but largely retain the ability to interact with other accounts across the system (as in the cluster).
-
+>
 > Regarding this project, the relevant follow-up question is:
 >
 > Is it desirable for an agent to be deployed to investigate an issue regarding the boundary and connection of multiple accounts?
