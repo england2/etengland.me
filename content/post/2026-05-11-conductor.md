@@ -18,11 +18,11 @@ https://github.com/england2/aws-demo/
 
 The Agent Conductor is responsible for scheduling and managing agents in reaction to tickets and AWS platform incidents.
 
-The basic idea is that the conductor is the control process. It does not do the agent's work itself, and instead watches for inputs, decides whether to start an anagent, prepares the agent's task files, and then starts a worker.
+The basic idea is that the conductor is the control process. It does not do the agent's work itself, and instead watches for inputs, decides whether to start an agent, prepares the agent's task files, and then starts a worker.
 
 At a high level, here is how this project works:
 
-- Tickets and CloudWatch alarms pushed to an SQS queue which the conductor polls for new work
+- Tickets and CloudWatch alarms are pushed to an SQS queue which the conductor polls for new work
 - When the conductor gets new SQS messages, it passes the messages to the scheduler routine:
     - The scheduler places all tickets and incident alarms into an internal database
     - The scheduler relates new messages to old messages, determining if a job has already been spawned for the ticket or for incident messaging relating to an ongoing incident
@@ -39,9 +39,9 @@ The conductor currently handles two kinds of inputs:
 
 # Database Scheduling System
 
-The conductor is responsible for deciding *when* to schedule an agent to run, in additon to *what type* of agent it will be, e.g an incident response or a ticket worker.
+The conductor is responsible for deciding *when* to schedule an agent to run, in addition to *what type* of agent it will be, e.g, an incident response or a ticket worker.
 
-So far, there are two types of scheduling that the conductor can perform, which are ticket scheduling and incident scheduling.
+So far, there are two types of scheduling that the conductor can perform, which are ticket scheduling and incident scheduling, which spawn the two worker types above.
 
 Here is how both work.
 
@@ -63,14 +63,12 @@ We're trying to spawn agents in reaction to AWS platform events, so there is sli
 
 - The conductor receives a CloudWatch alarm message from SQS.
 - The scheduler stores the alarm in the database.
-- The scheduler then determines if the alarm is "chained" to other alarms. The current logic is such that an alarm is chained if:
-  - 1. It belongs to the same group as other alarms, where groups determined by the AWS account number included in the alarm message body.
-  - 2. AND the alarm has occured within one hour as the most recent alarm in its group.
-- To schedule an agent for an incident, the scheduler must see at least two chained alarms. This means the first alarm of an incident that reaches the scheduler will not spawn an agent.
+- The scheduler then determines if the alarm is "chained" to other alarms. Alarms are chained if they are as recent as with one hour of another alarm which has the AWS account number.
+- This way, a single incident which produces many alarms will only spawn a single worker to investigate.
 
 Incident scheduling is more careful because alarms can arrive in bursts. If 10 alarms are all part of the same problem, we probably do not want 10 agents working on it. We want one agent with enough context to understand the ongoing incident.
 
-## Acheiving Program Durability via Scheduling on a Database
+## Achieving Program Durability via Scheduling on a Database
 
 The above describes simple scheduling logic that could easily be done in program memory without a database.
 
@@ -81,7 +79,7 @@ The database is useful because it lets the conductor remember what has already b
 ## Improved Program Testability With Database Scheduling
 Deciding when to spawn an agent *and* with what context, permissions, repos, prompts, etc. to provide the agent with is an extremely important part of the program. Agent scheduling mistakes may include spawning too many agents or spawning agents that don't have the proper context/permissions to do their job. 
 
-**It's important to get scheduling mistakes right, as badly scheduled agents will likely produce these kinds of penatlies:**
+**It's important to get scheduling mistakes right, as badly scheduled agents will likely produce these kinds of penalties:**
   - Wasting engineer hours on reviewing diffs that shouldn't exist in the first place (happens if we spawn too many agents; agents with weak context)
   - Wasting money on fargate instances (too many agents)
   - Delayed execution of legitimate agent work (too many agents)
@@ -91,7 +89,7 @@ Therefore, we want to make sure we get agent scheduling right.
 
 Basing scheduling decisions on a database means that we can load many scenarios into different test databases and see exactly what scheduling and spawn-context decisions the Conductor would make under many situations.
 
-For example, what scheduling decisions will be made if 100 alarms goe off at once in a 40 minute period and if the system gets sent 10 tickets per second? Will the conductor allocate agents to the correct repositories, will it choose to solve tickets instead of reacting to the incident, will it encounter an obscure logic error and not schedule anything at all, will it spawn agents that are at risk of encountering merge issues?
+For example, what scheduling decisions will be made if 100 alarms go off at once in a 40 minute period? Or if the system gets sent 10 tickets per second? Will the conductor allocate agents to the correct repositories, will it choose to solve tickets instead of reacting to the incident, will it encounter an obscure logic error and not schedule anything at all, will it spawn agents that are at risk of encountering merge issues?
 
 To reiterate, these are all questions that can be answered when the correct test data is written, because the scheduler mostly looks at its internal database to schedule agents *and not* ephemeral, in-memory data structures.
 
@@ -102,9 +100,17 @@ Notably, one could use old, existing system data to test scheduling in addition 
 > ### Note: Incident Scheduling vs Ticket Scheduling in Early Versions
 > The above penalties and potential complexity wouldn't occur if the conductor only solved tickets instead of also reacting to alarms.
 >
-> For this reason, I'm interested in getting a rock solid base program with well-tested subsystems (e.g git/platform permissions, multi-AWS account complexity sorted out, repo-claiming, etc.) *before* trying to implement potentially complex incident-based scheduling that may rely on OTel, CloudWatch, and other data to make decisions.
+> For this reason, I'm interested in getting a rock solid base program with well-tested subsystems (e.g, git/platform permissions, multi-AWS account complexity sorted out, repo-claiming, etc.) *before* trying to implement potentially complex incident-based scheduling that may rely on OTel, CloudWatch, and other data to make decisions.
 >
 > In short, the v1 production conductor would only respond to tickets. This would allow time to iron-out the system's fundamentals while it still has predictable ticket-only scheduling and the stakes/penalties are generally lower.
+>
+> Additionally, note that while the current scheduling logic is very simple, in production the scheduling step would likely expand subsystems could include:
+> - A repo-claiming system to prevent two agents from simultaneously working on the same codebase, thus removing the possibility of agent-to-agent merge conflicts
+> - A dev-container system to ensure that the agent will run it's main worker binary on the best possible execution environment possible.
+> A context-reuse system to allow agents to reuse their old memories of the familar codebases rather than having them spend many tokens to just get their bearings on each spawn.
+> A permissions system to ensure that agents have read-only access to AWS CLI tools that can help with their work.
+
+
 
 # Deployment Process
 
@@ -114,12 +120,12 @@ Basically, we can't just kill the server and restart it while there are active j
 
 To solve this, the deployment pipeline and conductor do two things:
 1. After the pipeline activates, the conductor will stop accepting new jobs.
-2. The conductor does not shutdown until the agents it is managing are finished with their work.
+2. The conductor does not shut down until the agents it is managing are finished with their work.
 
 Here's the rough overview:
 
 ## Conductor Deployment Process Summary
-The conductor uses the most simple inter process communication possible to start the shutdown routine when instructed by the CI, and also to report when it's shutdown safely: We literally just write specific files to the file system that are interpreted by the conductor and its deploy.
+The conductor uses very simple inter-process communication to start the shutdown routine when instructed by the CI, and also to report when its shut down safely: We literally just write specific files to the file system that are interpreted by the conductor and its deployment script.
 
 With that said, here's the rough order of events.
 
@@ -128,7 +134,7 @@ With that said, here's the rough order of events.
 - The conductor deploy pipeline uses AWS's SSM to activate these scripts 
 - The deploy script flips the watched file `IS_CONDUCTOR_SHUTTING_DOWN` to true.
   - Now, the conductor will not accept any more jobs.
-- The conductor waits for it's jobs to finish, writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, and the deploy script restarts the new conductor version.
+- The conductor waits for its jobs to finish, writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, and the deploy script restarts the new conductor version.
 
 <!-- 
 
