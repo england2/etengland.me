@@ -1,5 +1,5 @@
 +++
-title = "Agent Conductor Discussion (Working Copy)"
+title = "Agent Conductor Discussion (Euhn Lee)"
 date = 2026-05-11
 slug = "conductor"
 hidden_from_all_posts = false
@@ -18,24 +18,17 @@ https://github.com/england2/aws-demo/
 
 The Agent Conductor is responsible for scheduling and managing agents in reaction to tickets and AWS platform incidents.
 
-The basic idea is that the conductor is the control process. It does not do the agent's work itself, and instead watches for inputs, decides whether to start an agent, prepares the agent's task files, and then starts a worker.
-
 At a high level, here is how this project works:
 
 - Tickets and CloudWatch alarms are pushed to an SQS queue which the conductor polls for new work
 - When the conductor gets new SQS messages, it passes the messages to the scheduler routine:
     - The scheduler places all tickets and incident alarms into an internal database
-    - The scheduler relates new messages to old messages, determining if a job has already been spawned for the ticket or for incident messaging relating to an ongoing incident
+    - The scheduler uses a stable database to determine if a job has already been spawned for a ticket or ongoing incident
     - The scheduler routine returns to main with a decision whether or not to spawn an agent
-- The conductor interprets the decision and, if necessary, spawns an agent
-- The agent worker connects back to the conductor over gRPC
+- The conductor interprets the decision and, if necessary, spawns an agent via a container on Fargate
+- The agent's main binary entrypoint talks to the conductor via gRPC, waiting for task files that determine its job
 - The conductor sends the worker its task files
-- The worker runs Codex, does the requested work, and submits its changes to GitHub.
-
-The conductor currently handles two kinds of inputs:
-
-- Tickets, which will always spawn an agent
-- CloudWatch alarms, which may need to be grouped together so we do not spawn too many agents during one incident
+- The worker runs Codex, does the requested work, submits its changes to GitHub, and reports back to the conductor before shutting down
 
 # Database Scheduling System
 
@@ -54,8 +47,6 @@ Here is how both work.
 Ticket scheduling is simpler than incident scheduling. 
 Basically, the only point of the database here is to prevent repeating work.
 
-<br>
-
 
 ### Incident scheduling
 Incident scheduling relates to CloudWatch alarms, such as high CPU alerts, error rates, cost anomalies, etc.
@@ -64,9 +55,8 @@ We're trying to spawn agents in reaction to AWS platform events, so there is sli
 - The conductor receives a CloudWatch alarm message from SQS.
 - The scheduler stores the alarm in the database.
 - The scheduler then determines if the alarm is "chained" to other alarms. Alarms are chained if they are within one hour of another alarm with the same AWS account number.
-- This way, a single incident which produces many alarms will only spawn a single worker to investigate.
 
-Incident scheduling is more careful because alarms can arrive in bursts. If 10 alarms are all part of the same problem, we probably do not want 10 agents working on it. We want one agent with enough context to understand the ongoing incident.
+This way, a single incident which produces many alarms will only spawn a single worker to investigate per account.
 
 ## Achieving Program Durability via Scheduling on a Database
 
@@ -74,7 +64,7 @@ The above describes simple scheduling logic that could easily be done in program
 
 Of course, the issue with this is that program memory dies when the program dies.
 
-The database is useful because it lets the conductor remember what has already been scheduled. If the conductor restarts, we can look at the database and avoid spawning duplicate agents for the same ticket or the same incident.
+The database is useful because it lets the conductor remember what has already been scheduled. If the conductor restarts, it can continue its chaining logic where it left off just based on the database.
 
 ## Improved Program Testability With Database Scheduling
 Deciding when to spawn an agent *and* with what context, permissions, repos, prompts, etc. to provide the agent with is an extremely important part of the program. Agent scheduling mistakes may include spawning too many agents or spawning agents that don't have the proper context/permissions to do their job. 
@@ -103,8 +93,8 @@ Notably, one could use old, existing system data to test scheduling in addition 
 >
 > In short, the v1 production conductor would only respond to tickets. This would allow time to iron out the system's fundamentals while it still has predictable ticket-only scheduling and the stakes/penalties are generally lower.
 >
-> Finally, while the current scheduler may seem too simple to necessitate robust testing, note that the production scheduling step could expand into these subsystems or features:
-> - A repo-claiming system to prevent two agents from simultaneously working on the same codebase, thus removing easily avoided merge conflicts
+> Finally, while the current scheduler may seem too simple to necessitate robust testing, note that the scheduling step could expand into these subsystems or features:
+> - A repo-claiming system to prevent two agents from simultaneously working on the same codebase, thus preventing easily avoided merge conflicts.
 > - A dev-container system to ensure that the agent will run its main worker binary on the best possible execution environment possible.
 > - A context-reuse system to allow agents to reuse their old memories of familiar codebases rather than wasting many tokens getting their bearings on every spawn.
 > - A job retry system.
@@ -125,9 +115,11 @@ We achieve this using a simple system described below.
 The main logic units of the conductor all run in goroutines, which on their own do not prevent the program from returning from main and exiting.
 
 The conductor process stays open by maintaining a shutdown gate, which is just a for loop with a few conditionals.
-The conductor watches a file called `IS_CONDUCTOR_SHUTTING_DOWN` which starts as `false`. When we deploy a new version of a conductor, the deployment process flips this file to true, and the conductor will not schedule new jobs, allowing them to safely pool in the SQS queue.
+The conductor watches a file called `IS_CONDUCTOR_SHUTTING_DOWN` which starts as `false`. When we deploy a new version of a conductor, the deployment process flips this file to `true`, and the conductor will not schedule new jobs, allowing messages to safely pool in the SQS queue.
 
-After this point, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
+After the file is `false`, the shutdown gate counts the number of active workers, and the program exits when it reaches zero. Before exiting, the conductor writes the file `CONDUCTOR_READY_FOR_SAFE_SHUTDOWN`, informing the deploy script that the shutdown gate has concluded and a new version can be deployed.
+
+> # Dev Notes
 
 <!-- 
 
