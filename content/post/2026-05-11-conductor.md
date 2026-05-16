@@ -124,7 +124,7 @@ This section holds some thoughts not related to the primary writeup.
 
 <br>
 
-> ### Agents improve From Existing DevOps Practices Such as Vagrant
+> ### Agents Improve From Existing DevOps Practices Such as Vagrant
 > Agents benefit from living in a runtime container that has all of the tools they need to work. For instance, agents won't be able to do their job if they lack `rustc` while working on Rust code. Additionally, they benefit from having the exact same tool versions that devs have, as well as miscellaneous scripts.
 >
 > Therefore, if each environment/repo the agent may alter uses tools like Vagrant to normalize developer workflows, the scheduler could consume a map relating AWS accounts to their associated dev containers.
