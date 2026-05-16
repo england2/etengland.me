@@ -120,16 +120,16 @@ After the file is set to `true`, the shutdown gate counts the number of active w
 
 > ## Miscellaneous Thoughts, Improvements, Etc.
 
-This section holds some thoughts not related to the primary writeup or inline.k
+This section holds some thoughts not related to the primary writeup.
 
 <br>
 
-> ### Usage of Tools Like Vagrant to Normalize Development Workflows
-> Agents benefit from a living in a runtime container that has all of the tools they need to work. For instance, agents won't be able to do their job if they lack `rustc` while working on Rust code. Additionally, they benefit from having the exact same tool versions that devs have, as well as miscellaneous scripts.
+> ### Agents improve From Existing DevOps Practices Such as Vagrant
+> Agents benefit from living in a runtime container that has all of the tools they need to work. For instance, agents won't be able to do their job if they lack `rustc` while working on Rust code. Additionally, they benefit from having the exact same tool versions that devs have, as well as miscellaneous scripts.
 >
-> Therefore, if each environment/repo the agent may alter uses tools like Vagrant to normalize developer workflows, the scheduler could consume a map relating AWS accounts to their associated development environment.
+> Therefore, if each environment/repo the agent may alter uses tools like Vagrant to normalize developer workflows, the scheduler could consume a map relating AWS accounts to their associated dev containers.
 >
-> Then a step could be performed to drop the worker binary onto an existing developer environment container, which could serve as the agent's execution environment.
+> Instead of running an agent in a general purpose container, a step could be performed to drop the worker binary onto an existing developer environment container, serving as the agent's execution environment.
 
 <br>
 
